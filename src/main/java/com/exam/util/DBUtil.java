@@ -14,7 +14,7 @@ import java.util.Map;
     // 생성해줘야 Article 클래스에서 사용 가능.
     public class DBUtil {
 
-        public static Map<String, Object> selectRow(Connection dbConn, String sql) {
+        public static Map<String, Object> selectRow(Connection dbConn, SecSql sql) throws SQLException {
             List<Map<String, Object>> rows = selectRows(dbConn, sql);
 
             if (rows.size() == 0) {
@@ -24,14 +24,14 @@ import java.util.Map;
             return rows.get(0);
         }
 
-        public static List<Map<String, Object>> selectRows(Connection dbConn, String sql){
+        public static List<Map<String, Object>> selectRows(Connection dbConn, SecSql sql){
             List<Map<String, Object>> rows = new ArrayList<>();
 
-            Statement stmt = null;
+            PreparedStatement stmt = null;
             ResultSet rs = null;
             try {
-                stmt = dbConn.createStatement();
-                rs = stmt.executeQuery(sql);
+                stmt = sql.getPreparedStatement(dbConn);
+                rs = stmt.executeQuery();
                 ResultSetMetaData metaData = rs.getMetaData();
                 int columnSize = metaData.getColumnCount();
 
@@ -58,28 +58,29 @@ import java.util.Map;
             }
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                if (rs != null) {
-                    try {
-                        rs.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                } finally {
                 if (stmt != null) {
                     try {
                         stmt.close();
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        throw new SQLErrorException("SQL 예외, SQL : " + sql, e);
                     }
                 }
+
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                        throw new SQLErrorException("SQL 예외, SQL : " + sql, e);
+                    }
+                }
+
             }
 
             return rows;
         }
 
-        public static int selectRowIntValue(Connection dbConn, String sql) {
+        public static int selectRowIntValue(Connection dbConn, SecSql sql) throws SQLException {
             Map<String, Object> row = selectRow(dbConn, sql);
             for (String key : row.keySet()) {
                 return (int) row.get(key);
@@ -87,7 +88,7 @@ import java.util.Map;
             return -1;
         }
 
-        public static String selectRowStringValue(Connection dbConn, String sql) {
+        public static String selectRowStringValue(Connection dbConn, SecSql sql) throws SQLException {
             Map<String, Object> row = selectRow(dbConn, sql);
 
             for (String key : row.keySet()) {
@@ -96,11 +97,76 @@ import java.util.Map;
             return "";
         }
 
-        public static boolean selectRowBooleanValue(Connection dbConn, String sql) {
+        public static boolean selectRowBooleanValue(Connection dbConn, SecSql sql) throws SQLException {
             Map<String, Object> row = selectRow(dbConn, sql);
             for (String key : row.keySet()) {
                 return((int)row.get(key))==1;
             }
             return false;
-        }
     }
+        public static int insert(Connection dbConn, SecSql sql) {
+            int id = -1;
+
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+
+            try {
+                stmt = sql.getPreparedStatement(dbConn);
+                stmt.executeUpdate();
+                rs = stmt.getGeneratedKeys();
+
+                if (rs.next()) {
+                    id = rs.getInt(1);
+                }
+
+            } catch (SQLException e) {
+                throw new SQLErrorException("SQL 예외, SQL : " + sql, e);
+            } finally {
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException e) {
+                        throw new SQLErrorException("SQL 예외, rs 닫기, SQL : " + sql, e);
+                    }
+                }
+
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException e) {
+                        throw new SQLErrorException("SQL 예외, stmt 닫기, SQL : " + sql, e);
+                    }
+                }
+
+            }
+
+            return id;
+        }
+
+        public static int update(Connection dbConn, SecSql sql) {
+            int affectedRows = 0;
+
+            PreparedStatement stmt = null;
+
+            try {
+                stmt = sql.getPreparedStatement(dbConn);
+                affectedRows = stmt.executeUpdate();
+            } catch (SQLException e) {
+                throw new SQLErrorException("SQL 예외, SQL : " + sql, e);
+            } finally {
+                if (stmt != null) {
+                    try {
+                        stmt.close();
+                    } catch (SQLException e) {
+                        throw new SQLErrorException("SQL 예외, stmt 닫기, SQL : " + sql, e);
+                    }
+                }
+            }
+
+            return affectedRows;
+        }
+
+        public static int delete(Connection dbConn, SecSql sql) {
+            return update(dbConn, sql);
+        }
+}

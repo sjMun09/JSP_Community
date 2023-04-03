@@ -1,6 +1,7 @@
 package com.exam.Servlet;
 
 import com.exam.util.DBUtil;
+import com.exam.util.SecSql;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -35,20 +36,17 @@ public class ArticleListServlet extends HttpServlet {
             return;
         }
 
-        String url = "jdbc:mysql://127.0.0.1:3306/JSP_Community?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
-        String user = "sjMun09";
-        String password = "85947ads";
+        String url = "dbc:mysql://localhost:3306/JSP_Community";
+        String user = "root";
+        String password = "85947ads$%";
         try {
-            // user pw 는 본인 마음대로 설정해도 됨. (넘겨줄거)
             conn = DriverManager.getConnection(url, user, password);
-            // req랑 resp 매개변수로 넘겨줌, Util 클래스에 생성해줘야함.
-            // 게시물 가져오기
-            String sql = "SELECT * FROM article";
-            // 그냥 못 가져오니까 맵형태로 가져오고 키로 받고, list
+
+            SecSql sql = SecSql.from("SELECT *");
+            sql.append("FROM article");
+            sql.append("ORDER BY id DESC");
             List<Map<String, Object>> articleRows = DBUtil.selectRows(conn, sql);
 
-            // 찍어보기
-            // System.out.println(sql);
             // 제목 넘기기
             req.setAttribute("articleRows", articleRows);
             // 이렇게 하면 웹앱을 안써도 상위 디렉토리로 이동가능.

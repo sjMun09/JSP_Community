@@ -1,6 +1,7 @@
 package com.exam.Servlet;
 
 import com.exam.util.DBUtil;
+import com.exam.util.SecSql;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,9 +31,9 @@ public class ArticleDetailServlet extends HttpServlet {
             return;
         }
 
-        String url = "jdbc:mysql://127.0.0.1:3306/JSP_Community?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
-        String user = "sjMun09";
-        String password = "85947ads";
+        String url = "jdbc:mysql://localhost:3306/JSP_Community";
+        String user = "root";
+        String password = "85947ads$%";
         try {
             // user pw 는 본인 마음대로 설정해도 됨. (넘겨줄거)
             conn = DriverManager.getConnection(url, user, password);
@@ -40,7 +41,10 @@ public class ArticleDetailServlet extends HttpServlet {
             int id = Integer.parseInt(req.getParameter("id"));
 
             // 게시물 가져오기
-            String sql = "SELECT * FROM article";
+            SecSql sql = SecSql.from("SELECT *");
+            sql.append("FROM article");
+            sql.append("WHERE id = ? ", id);
+
             // 그냥 못 가져오니까 맵형태로 가져오고 키로 받고, list
             Map<String, Object> articleRow = DBUtil.selectRow(conn, sql);
 
