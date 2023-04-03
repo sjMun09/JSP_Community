@@ -49,8 +49,12 @@ public class ArticleListServlet extends HttpServlet {
             // 찍어보기
             // System.out.println(sql);
 
-            // 넘기기
+            // 제목 넘기기
             req.setAttribute("articleRows", articleRows);
+            // 이렇게 하면 웹앱을 안써도 상위 디렉토리로 이동가능.
+            req.getRequestDispatcher("../article/list.jsp").forward(req, resp);
+
+
 
 
         } catch (SQLException e) {
