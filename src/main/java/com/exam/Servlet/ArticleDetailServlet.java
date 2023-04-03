@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 // 게시물 불러오기
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/detail")
+public class ArticleDetailServlet extends HttpServlet {
     // 좀더 적은 데이터는 doGet, 좀더 보안처리는 doPost
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -55,10 +55,10 @@ public class ArticleListServlet extends HttpServlet {
             // 제목 넘기기
             req.setAttribute("articleRows", articleRows);
             // 이렇게 하면 웹앱을 안써도 상위 디렉토리로 이동가능.
-            req.getRequestDispatcher("../article/list.jsp").forward(req, resp);
+            req.getRequestDispatcher("../article/detail.jsp").forward(req, resp);
 
         } catch (SQLException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         } finally {
             try {
                 if (conn != null && !conn.isClosed()) {
