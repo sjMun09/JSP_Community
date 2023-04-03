@@ -44,7 +44,14 @@ public class ArticleListServlet extends HttpServlet {
             // 게시물 가져오기
             String sql = "SELECT * FROM article";
             // 그냥 못 가져오니까 맵형태로 가져오고 키로 받고, list
-            List<Map<String, Object>> articleRows;
+            List<Map<String, Object>> articleRows = dbUtil.selectRows(conn, sql);
+
+            // 찍어보기
+            // System.out.println(sql);
+
+            // 넘기기
+            req.setAttribute("articleRows", articleRows);
+
 
         } catch (SQLException e) {
                 e.printStackTrace();
