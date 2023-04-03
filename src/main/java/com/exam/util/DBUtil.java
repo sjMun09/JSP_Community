@@ -10,17 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
     // 생성해줘야 Article 클래스에서 사용 가능.
     public class DBUtil {
-        private HttpServletRequest res;
-        private HttpServletResponse resp;
 
-        public DBUtil(HttpServletRequest res, HttpServletResponse resp) {
-            this.res = res;
-            this.resp = resp;
-        }
-
-        public Map<String, Object> selectRow(Connection dbConn, String sql) {
+        public static Map<String, Object> selectRow(Connection dbConn, String sql) {
             List<Map<String, Object>> rows = selectRows(dbConn, sql);
 
             if (rows.size() == 0) {
@@ -30,7 +24,7 @@ import java.util.Map;
             return rows.get(0);
         }
 
-        public List<Map<String, Object>> selectRows(Connection dbConn, String sql){
+        public static List<Map<String, Object>> selectRows(Connection dbConn, String sql){
             List<Map<String, Object>> rows = new ArrayList<>();
 
             Statement stmt = null;
@@ -63,13 +57,13 @@ import java.util.Map;
                 rows.add(row);
             }
             } catch (SQLException e) {
-                Util.printEx("SQL 예외, SQL : " + sql,resp, e);
+                e.printStackTrace();
             } finally {
                 if (rs != null) {
                     try {
                         rs.close();
                     } catch (SQLException e) {
-                        Util.printEx("SQL 예외, rs 닫기 " ,resp, e);
+                        e.printStackTrace();
                     }
                 }
 
@@ -77,7 +71,7 @@ import java.util.Map;
                     try {
                         stmt.close();
                     } catch (SQLException e) {
-                        Util.printEx("SQL 예외, stmt 닫기" ,resp,e);
+                        e.printStackTrace();
                     }
                 }
             }
@@ -85,7 +79,7 @@ import java.util.Map;
             return rows;
         }
 
-        public int selectRowIntValue(Connection dbConn, String sql) {
+        public static int selectRowIntValue(Connection dbConn, String sql) {
             Map<String, Object> row = selectRow(dbConn, sql);
             for (String key : row.keySet()) {
                 return (int) row.get(key);
@@ -93,7 +87,7 @@ import java.util.Map;
             return -1;
         }
 
-        public String selectRowStringValue(Connection dbConn, String sql) {
+        public static String selectRowStringValue(Connection dbConn, String sql) {
             Map<String, Object> row = selectRow(dbConn, sql);
 
             for (String key : row.keySet()) {
@@ -102,7 +96,7 @@ import java.util.Map;
             return "";
         }
 
-        public boolean selectRowBooleanValue(Connection dbConn, String sql) {
+        public static boolean selectRowBooleanValue(Connection dbConn, String sql) {
             Map<String, Object> row = selectRow(dbConn, sql);
             for (String key : row.keySet()) {
                 return((int)row.get(key))==1;

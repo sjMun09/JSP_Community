@@ -18,11 +18,6 @@ public class ArticleDetailServlet extends HttpServlet {
     // 좀더 적은 데이터는 doGet, 좀더 보안처리는 doPost
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // 언어 읽을 수 있게 추가
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        resp.setContentType("text/html; charset-utf-8");
-
         // db 연동부분 가져오기 App.java 확인해보고,db연동 확인하고, 필요한 객체 생성.
 
         // DB 연결시작
@@ -36,24 +31,24 @@ public class ArticleDetailServlet extends HttpServlet {
         }
 
         String url = "jdbc:mysql://127.0.0.1:3306/JSP_Community?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
-        String user = "sbsst";
-        String password = "sbs123414";
+        String user = "sjMun09";
+        String password = "85947ads";
         try {
             // user pw 는 본인 마음대로 설정해도 됨. (넘겨줄거)
             conn = DriverManager.getConnection(url, user, password);
             // req랑 resp 매개변수로 넘겨줌, Util 클래스에 생성해줘야함.
-            DBUtil dbUtil = new DBUtil(req, resp);
+            int id = Integer.parseInt(req.getParameter("id"));
 
             // 게시물 가져오기
             String sql = "SELECT * FROM article";
             // 그냥 못 가져오니까 맵형태로 가져오고 키로 받고, list
-            List<Map<String, Object>> articleRows = dbUtil.selectRows(conn, sql);
+            Map<String, Object> articleRow = DBUtil.selectRow(conn, sql);
 
             // 찍어보기
             // System.out.println(sql);
 
             // 제목 넘기기
-            req.setAttribute("articleRows", articleRows);
+            req.setAttribute("articleRow", articleRow);
             // 이렇게 하면 웹앱을 안써도 상위 디렉토리로 이동가능.
             req.getRequestDispatcher("../article/detail.jsp").forward(req, resp);
 
